@@ -10,6 +10,7 @@ export class VectorRepository implements IVectorRepository {
 
   async insertChunk(
     meetingId: string,
+    userId: string,
     chunkIndex: number,
     text: string,
     vector: Float32Array,
@@ -21,6 +22,7 @@ export class VectorRepository implements IVectorRepository {
         vector,
         text,
         meetingId,
+        userId,
         chunkIndex,
         metadata: JSON.stringify(metadata),
       }]);
@@ -33,6 +35,7 @@ export class VectorRepository implements IVectorRepository {
   async insertChunksBatch(
     chunks: Array<{
       meetingId: string;
+      userId: string;
       chunkIndex: number;
       text: string;
       vector: Float32Array;
@@ -45,6 +48,7 @@ export class VectorRepository implements IVectorRepository {
         vector: c.vector,
         text: c.text,
         meetingId: c.meetingId,
+        userId: c.userId,
         chunkIndex: c.chunkIndex,
         metadata: JSON.stringify(c.metadata),
       }));
@@ -59,31 +63,28 @@ export class VectorRepository implements IVectorRepository {
   async searchSimilar(
     vector: Float32Array,
     limit: number,
-    threshold: number = 0.7
+    threshold: number = 0.7,
+    filters?: { userId?: string }
   ): Promise<Array<{ text: string; meetingId: string; similarity: number; metadata: any }>> {
     try {
       const table = await getChunksTable();
       
-      // LanceDB search returns distance (L2 or Cosine)
-      // By default it might use L2. We can specify distance type if needed.
-      const results = await table
-        .vectorSearch(Array.from(vector))
-        .limit(limit)
-        .toArray();
+      let query = table.vectorSearch(Array.from(vector));
+      
+      if (filters?.userId) {
+        query = query.where(`userId = "${filters.userId}"`);
+      }
 
-      logger.info('Vector Search Raw Results', { 
-        count: results.length,
-        results: results.map(r => ({ dist: (r as any)._distance, text: (r as any).text.substring(0, 30) }))
-      });
+      const results = await query.limit(limit).toArray();
 
       return results.map((r: any) => ({
         text: r.text,
         meetingId: r.meetingId,
-        similarity: Math.max(0, 1 - (r._distance || 0) / 2), // Better scaling for L2
+        similarity: Math.max(0, 1 - (r._distance || 0) / 2),
         metadata: JSON.parse(r.metadata || '{}'),
       })).filter((r: any) => r.similarity >= threshold);
     } catch (error) {
-      logger.error('Error searching LanceDB', { error });
+      logger.error('Error searching LanceDB', { error, filters });
       throw error;
     }
   }
@@ -103,8 +104,6 @@ export class VectorRepository implements IVectorRepository {
     try {
       const table = await getChunksTable();
       if (meetingId) {
-        // LanceDB Node SDK might not have a filtered countRows yet, 
-        // fallback to querying if needed or use search query
         const results = await table.query().where(`meetingId = "${meetingId}"`).toArray();
         return results.length;
       }

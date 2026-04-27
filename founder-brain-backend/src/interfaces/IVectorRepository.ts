@@ -7,6 +7,7 @@ export interface IVectorRepository {
    */
   insertChunk(
     meetingId: string, 
+    userId: string,
     chunkIndex: number, 
     text: string, 
     vector: Float32Array, 
@@ -19,6 +20,7 @@ export interface IVectorRepository {
   insertChunksBatch(
     chunks: Array<{
       meetingId: string;
+      userId: string;
       chunkIndex: number;
       text: string;
       vector: Float32Array;
@@ -32,7 +34,8 @@ export interface IVectorRepository {
   searchSimilar(
     vector: Float32Array, 
     limit: number, 
-    threshold?: number
+    threshold?: number,
+    filters?: { userId?: string }
   ): Promise<Array<{
     text: string;
     meetingId: string;

@@ -1,4 +1,4 @@
-import { ClientSession } from 'mongoose';
+import { ClientSession, Types } from 'mongoose';
 import { Meeting, IMeetingDocument } from '../models/Meeting';
 import { IMeetingRepository } from '../interfaces/IMeetingRepository';
 import logger from '../config/logger';
@@ -88,6 +88,7 @@ export class MeetingRepository implements IMeetingRepository {
   ): Promise<{ meetings: IMeetingDocument[]; total: number }> {
     try {
       const query: any = {};
+      if (filters.userId) query.userId = filters.userId;
       if (filters.status) query.processingStatus = filters.status;
       if (filters.search) {
         query.$or = [
@@ -115,9 +116,10 @@ export class MeetingRepository implements IMeetingRepository {
     }
   }
 
-  async getStatistics(options?: { session?: ClientSession }): Promise<{ total: number; byStatus: Record<string, number> }> {
+  async getStatistics(userId: string, options?: { session?: ClientSession }): Promise<{ total: number; byStatus: Record<string, number> }> {
     try {
       const stats = await Meeting.aggregate([
+        { $match: { userId: new Types.ObjectId(userId) } },
         {
           $group: {
             _id: '$processingStatus',
@@ -126,7 +128,7 @@ export class MeetingRepository implements IMeetingRepository {
         },
       ]).session(options?.session || null);
 
-      const total = await Meeting.countDocuments().session(options?.session || null);
+      const total = await Meeting.countDocuments({ userId }).session(options?.session || null);
       const byStatus: Record<string, number> = {};
       stats.forEach((s) => {
         byStatus[s._id] = s.count;
@@ -134,7 +136,7 @@ export class MeetingRepository implements IMeetingRepository {
 
       return { total, byStatus };
     } catch (error) {
-      logger.error('Error getting meeting statistics', { error });
+      logger.error('Error getting meeting statistics', { error, userId });
       throw error;
     }
   }

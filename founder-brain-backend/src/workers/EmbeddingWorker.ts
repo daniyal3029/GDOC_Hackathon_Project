@@ -2,10 +2,7 @@ import { Worker, Job } from 'bullmq';
 import { redisClient } from '../config/redis';
 import { EMBEDDING_QUEUE_NAME, EmbeddingJobData } from '../queues/embeddingQueue';
 import { VectorService } from '../services/VectorService';
-import { EmbeddingService } from '../services/EmbeddingService';
-import { VectorRepository } from '../repositories/VectorRepository';
 import { Meeting } from '../models/Meeting';
-import logger from '../config/logger';
 
 /**
  * Worker for processing embedding jobs.
@@ -18,24 +15,23 @@ export const startEmbeddingWorker = async () => {
   const worker = new Worker(
     EMBEDDING_QUEUE_NAME,
     async (job: Job<EmbeddingJobData>) => {
-      const { meetingId, text, summary, decisions } = job.data;
+      const { meetingId, userId, text, summary, decisions } = job.data;
       
       try {
-        logger.info('Processing embedding job', { jobId: job.id, meetingId });
+        logger.info('Processing embedding job', { jobId: job.id, meetingId, userId });
         
-        // Update status to processing
         await Meeting.findByIdAndUpdate(meetingId, { 
           embeddingStatus: 'processing' 
         });
 
         const chunkCount = await vectorService.indexMeeting(
           meetingId,
+          userId,
           text,
           summary,
           decisions
         );
 
-        // Update status to completed
         await Meeting.findByIdAndUpdate(meetingId, { 
           embeddingStatus: 'completed',
           embeddingChunksCount: chunkCount,
@@ -59,7 +55,7 @@ export const startEmbeddingWorker = async () => {
     },
     {
       connection: redisClient.duplicate(),
-      concurrency: 2, // Limit concurrent embedding tasks
+      concurrency: 2,
     }
   );
 

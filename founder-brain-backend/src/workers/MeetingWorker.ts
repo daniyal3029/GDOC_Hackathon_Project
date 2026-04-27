@@ -26,11 +26,11 @@ export class MeetingWorker {
    * Process a single meeting job.
    */
   async process(job: Job<MeetingJobData>): Promise<void> {
-    const { meetingId, text } = job.data;
+    const { meetingId, userId, text } = job.data;
     const startTime = Date.now();
     const room = `meeting:${meetingId}`;
 
-    this.logger.info('Starting meeting processing job', { jobId: job.id, meetingId });
+    this.logger.info('Starting meeting processing job', { jobId: job.id, meetingId, userId });
 
     try {
       // 1. Update status to processing
@@ -43,7 +43,7 @@ export class MeetingWorker {
         step: 'queued'
       });
 
-      // 2. Extract AI insights (OUTSIDE transaction as it's an external API call)
+      // 2. Extract AI insights
       this.logger.info('Calling AI Service...', { meetingId });
       this.socketServer.emitToRoom(room, SocketEvents.MEETING_STATUS, { 
         meetingId, 
@@ -68,21 +68,19 @@ export class MeetingWorker {
         step: 'saving_tasks'
       });
 
-      // 4. Create tasks and update meeting atomically using ACID transaction
+      // 4. Create tasks and update meeting atomically
       await runTransaction(async (session) => {
-        // Create tasks
+        // Create tasks with userId
         const taskData = aiResult.tasks.map(t => ({
           description: t.task,
           owner: t.owner,
+          userId: new mongoose.Types.ObjectId(userId) as any,
           deadline: t.deadline ? new Date(t.deadline) : null,
           meetingId: new mongoose.Types.ObjectId(meetingId),
         }));
 
         const createdTasks = await this.taskRepository.createMany(taskData, { session });
         
-        // Emit task creation for each task (after transaction commits conceptually, but we do it here)
-        // Note: Socket emits are side-effects and can't be rolled back, 
-        // but in a production app you might queue these until after commit.
         createdTasks.forEach(task => {
           if (task.owner) {
             this.socketServer.emitToUser(task.owner, SocketEvents.TASK_CREATED, {
@@ -135,6 +133,7 @@ export class MeetingWorker {
         
         await addEmbeddingJob({
           meetingId,
+          userId,
           text,
           summary: aiResult.summary,
           decisions: aiResult.decisions,

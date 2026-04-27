@@ -27,11 +27,11 @@ export const meetingQueue = new Queue<MeetingJobData>(QUEUE_NAME, {
  * @param meetingId - The ID of the meeting document.
  * @param text - The raw meeting text.
  */
-export const addMeetingJob = async (meetingId: string, text: string): Promise<Job<MeetingJobData>> => {
+export const addMeetingJob = async (meetingId: string, userId: string, text: string): Promise<Job<MeetingJobData>> => {
   try {
     const job = await meetingQueue.add(
       'process-meeting',
-      { meetingId, text },
+      { meetingId, userId, text },
       { jobId: `meeting-${meetingId}` } // Idempotency by meeting ID
     );
     logger.info('Meeting job added to queue', { jobId: job.id, meetingId });

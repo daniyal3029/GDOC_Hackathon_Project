@@ -1,4 +1,4 @@
-import { ClientSession } from 'mongoose';
+import { ClientSession, Types } from 'mongoose';
 import { Task, ITaskDocument } from '../models/Task';
 import { ITaskRepository } from '../interfaces/ITaskRepository';
 import logger from '../config/logger';
@@ -52,6 +52,7 @@ export class TaskRepository implements ITaskRepository {
     try {
       const query: any = {};
       
+      if (filters.userId) query.userId = filters.userId;
       if (filters.status) query.status = filters.status;
       if (filters.owner) query.owner = { $regex: filters.owner, $options: 'i' };
       if (filters.meetingId) query.meetingId = filters.meetingId;
@@ -77,10 +78,10 @@ export class TaskRepository implements ITaskRepository {
     }
   }
 
-  async findPendingGroupedByOwner(options?: { session?: ClientSession }): Promise<any> {
+  async findPendingGroupedByOwner(userId: string, options?: { session?: ClientSession }): Promise<any> {
     try {
       const result = await Task.aggregate([
-        { $match: { status: 'pending' } },
+        { $match: { status: 'pending', userId: new Types.ObjectId(userId) } },
         { $sort: { deadline: 1 } },
         {
           $group: {
@@ -97,7 +98,7 @@ export class TaskRepository implements ITaskRepository {
 
       return grouped;
     } catch (error) {
-      logger.error('Error grouping pending tasks', { error });
+      logger.error('Error grouping pending tasks', { error, userId });
       throw error;
     }
   }

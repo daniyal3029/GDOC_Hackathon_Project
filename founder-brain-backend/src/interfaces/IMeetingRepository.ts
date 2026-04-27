@@ -22,6 +22,6 @@ export interface IMeetingRepository {
     pagination: { skip: number; limit: number; sortBy?: string; sortOrder?: string },
     options?: { session?: ClientSession }
   ): Promise<{ meetings: IMeetingDocument[]; total: number }>;
-  getStatistics(options?: { session?: ClientSession }): Promise<{ total: number; byStatus: Record<string, number> }>;
+  getStatistics(userId: string, options?: { session?: ClientSession }): Promise<{ total: number; byStatus: Record<string, number> }>;
   getTaskCompletionRate(meetingId: string, options?: { session?: ClientSession }): Promise<{ total: number; completed: number; percent: number }>;
 }

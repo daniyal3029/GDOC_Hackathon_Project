@@ -10,7 +10,7 @@ export interface IMeetingService {
   /**
    * Start processing a meeting notes text asynchronously.
    */
-  processMeetingAsync(text: string, idempotencyKey?: string): Promise<{ jobId: string; meetingId: string }>;
+  processMeetingAsync(userId: string, text: string, idempotencyKey?: string): Promise<{ jobId: string; meetingId: string }>;
 
   /**
    * Get the current status and progress of a meeting processing.
@@ -30,7 +30,7 @@ export interface IMeetingService {
   /**
    * Get statistics for meetings.
    */
-  getMeetingStatistics(): Promise<any>;
+  getMeetingStatistics(userId: string): Promise<any>;
 
   /**
    * Get meeting with task progress.

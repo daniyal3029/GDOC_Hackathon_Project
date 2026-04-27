@@ -28,7 +28,7 @@ export class StreamingQueryService {
       this.logger.info('Starting context retrieval for streaming (Gemini)...', { question });
       
       // 1. Retrieve context
-      const relevantContext = await this.vectorService.searchContext(question, 5);
+      const relevantContext = await this.vectorService.searchContext(question, context.userId, 5);
       
       const contextText = relevantContext
         .map((c, i) => `[Source ${i + 1} - Meeting ${c.meetingId}]: ${c.text}`)

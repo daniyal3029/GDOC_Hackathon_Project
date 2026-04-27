@@ -1,9 +1,11 @@
-import express, { Application } from 'express';
+import express, { Application, Request, Response } from 'express';
 import compression from 'compression';
+import cookieParser from 'cookie-parser';
 import healthCheck from './middleware/healthCheck';
 import meetingRoutes from './routes/meetingRoutes';
 import taskRoutes from './routes/taskRoutes';
 import queryRoutes from './routes/queryRoutes';
+import authRoutes from './routes/authRoutes';
 import notificationRoutes from './routes/notificationRoutes';
 import metricsRoutes from './routes/metricsRoutes';
 import adminRoutes from './routes/adminRoutes';
@@ -28,6 +30,9 @@ import { wsSecurityHeaders } from './socket/securityHeaders';
 import { requestTracerMiddleware } from './middleware/requestTracer';
 import { metricsMiddleware } from './middleware/metricsMiddleware';
 
+// Phase 13 Auth & CSRF
+import { doubleCsrfProtection, generateCsrfToken } from './middleware/csrf';
+
 /**
  * Express Application setup.
  */
@@ -38,18 +43,18 @@ app.set('trust proxy', 1); // Trust first proxy if deploying behind Nginx/ALB
 // Apply WS Security Headers on the socket path before body parsers
 app.use(config.SOCKET_PATH || '/socket.io', wsSecurityHeaders);
 
-// 0. Request Tracing (must be first — wraps everything in AsyncLocalStorage context)
+// 0. Request Tracing
 app.use(requestTracerMiddleware);
 
 // 1. Prometheus Metrics Recording
 app.use(metricsMiddleware);
 
-// 2. Performance Monitoring (Response Time)
+// 2. Performance Monitoring
 app.use(performanceMiddleware(logger));
 
-// 3. DDoS Protection (Pre-body parsing)
+// 3. DDoS Protection
 app.use(ddosProtection);
-app.use(blockListCheck); // Check if IP is temporarily blocked
+app.use(blockListCheck);
 
 // 4. Security Headers
 app.use(helmetConfig());
@@ -64,24 +69,35 @@ app.use(compression({
 // 6. Cross-Origin Resource Sharing
 app.use(corsConfig());
 
-// 7. Global Rate Limiter
+// 7. Cookie Parser (Required for Auth & CSRF)
+app.use(cookieParser(config.CSRF_SECRET));
+
+// 8. Global Rate Limiter
 app.use(globalRateLimiter);
 
-// 8. Body Parsers & Input Sanitization
+// 9. Body Parsers & Input Sanitization
 app.use(sanitizationPipeline);
 
-// 9. Global Cache Middleware (Only for GET requests)
+// 10. CSRF Protection (Applied after body parsing)
+app.get('/api/auth/csrf-token', (req: Request, res: Response) => {
+  const token = generateCsrfToken(req, res);
+  res.json({ success: true, token });
+});
+app.use(doubleCsrfProtection);
+
+// 11. Global Cache Middleware
 const cacheService = container.getCacheService();
 app.use(cacheMiddleware(cacheService));
 
-// 10. Idempotency Middleware (For write operations)
+// 12. Idempotency Middleware
 const idempotencyService = container.getIdempotencyService();
 app.use(idempotencyMiddleware(idempotencyService));
 
-// 11. Routes
+// 13. Routes
 app.get('/health', healthCheck);
-app.use('/', metricsRoutes); // /metrics, /live, /ready, /health/detailed
-app.use('/admin', adminRoutes); // /admin/dashboard
+app.use('/', metricsRoutes);
+app.use('/admin', adminRoutes);
+app.use('/api/auth', authRoutes); // Auth routes (login, register, logout, etc.)
 app.use('/api/meetings', meetingRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/query', queryRoutes);
@@ -92,10 +108,7 @@ if (config.SWAGGER_ENABLED) {
   app.use(config.SWAGGER_PATH, docsRoutes);
 }
 
-// 12. Global Error Handler
+// 14. Global Error Handler
 app.use(errorHandler);
 
-/**
- * Export the app instance.
- */
 export default app;

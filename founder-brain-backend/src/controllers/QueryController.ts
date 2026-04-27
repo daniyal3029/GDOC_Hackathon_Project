@@ -20,10 +20,11 @@ export class QueryController {
   askQuestion = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const validated = AskQuestionRequestSchema.parse(req.body);
+      const userId = (req as any).user.userId;
       
-      this.logger.info('Received semantic query', { question: validated.question });
+      this.logger.info('Received semantic query', { question: validated.question, userId });
 
-      const result = await this.queryService.askQuestion(validated.question, { 
+      const result = await this.queryService.askQuestion(validated.question, userId, { 
         maxSources: validated.maxSources 
       });
       
@@ -42,6 +43,7 @@ export class QueryController {
    */
   getSuggestions = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      // Future: Suggestions could be personalized based on user's recent meetings
       const suggestions = [
         "What are the key decisions from this week?",
         "What tasks are assigned to me?",

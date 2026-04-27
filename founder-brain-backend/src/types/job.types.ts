@@ -3,6 +3,7 @@
  */
 export interface MeetingJobData {
   meetingId: string;
+  userId: string;
   text: string;
   idempotencyKey?: string;
 }

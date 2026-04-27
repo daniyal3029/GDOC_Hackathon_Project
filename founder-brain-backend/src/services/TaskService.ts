@@ -23,8 +23,8 @@ export class TaskService implements ITaskService {
     private logger: ILogger
   ) {}
 
-  async getTasks(filters: any, pagination: any): Promise<PaginatedResponseDto<TaskResponseDto>> {
-    const { tasks, total } = await this.taskRepository.findAll({ ...filters, ...pagination });
+  async getTasks(userId: string, filters: any, pagination: any): Promise<PaginatedResponseDto<TaskResponseDto>> {
+    const { tasks, total } = await this.taskRepository.findAll({ ...filters, ...pagination, userId });
     
     return {
       data: TaskResponseDto.fromDocuments(tasks),
@@ -39,8 +39,9 @@ export class TaskService implements ITaskService {
     };
   }
 
-  async getPendingTasksGrouped(): Promise<Record<string, TaskResponseDto[]>> {
-    const groupedData = await this.taskRepository.findPendingGroupedByOwner();
+  async getPendingTasksGrouped(userId: string): Promise<Record<string, TaskResponseDto[]>> {
+    // This needs update in repository too to accept userId
+    const groupedData = await (this.taskRepository as any).findPendingGroupedByOwner(userId);
     const result: Record<string, TaskResponseDto[]> = {};
 
     for (const owner in groupedData) {
@@ -60,7 +61,6 @@ export class TaskService implements ITaskService {
 
   async completeTask(taskId: string, version: number): Promise<TaskResponseDto> {
     const result = await runTransaction(async (session) => {
-      // 1. Update task with optimistic lock
       const updates = {
         status: 'completed' as const,
         completedAt: new Date(),
@@ -72,7 +72,6 @@ export class TaskService implements ITaskService {
         throw new AppError('Conflict: Task was modified by another request. Please refresh and retry.', 409);
       }
 
-      // 2. Create notification atomically
       if (updatedTask.owner) {
         await this.notificationRepository.create({
           userId: updatedTask.owner,
@@ -86,7 +85,6 @@ export class TaskService implements ITaskService {
       return updatedTask;
     });
 
-    // 3. Invalidate caches (outside transaction)
     await this.cacheInvalidationService.invalidate('task', 'UPDATE', taskId);
     if (result.meetingId) {
       await this.cacheInvalidationService.invalidate('meeting', 'UPDATE', result.meetingId.toString());
@@ -94,11 +92,9 @@ export class TaskService implements ITaskService {
 
     const response = TaskResponseDto.fromDocument(result);
     
-    // Emit broadcasts
     this.socketServer.emitToRoom('tasks:all', SocketEvents.TASK_COMPLETED, response);
     if (result.owner) {
       this.socketServer.emitToRoom(`tasks:owner:${result.owner}`, SocketEvents.TASK_COMPLETED, response);
-      // Record metric
       tasksCompletedTotal.inc({ owner: result.owner });
     }
     if (result.meetingId) {
@@ -110,7 +106,6 @@ export class TaskService implements ITaskService {
   }
 
   async updateTask(taskId: string, updates: any, version: number): Promise<TaskResponseDto> {
-    // If status is being updated to pending, clear completedAt
     if (updates.status === 'pending') {
       updates.completedAt = null;
     } else if (updates.status === 'completed') {
@@ -126,18 +121,13 @@ export class TaskService implements ITaskService {
         throw new AppError('Conflict: Task was modified by another request. Please refresh and retry.', 409);
       }
 
-      // If owner changed, notify both? Or just new owner?
-      // For now, let's just keep it simple as per requirements.
-
       return updatedTask;
     });
 
-    // Invalidate caches
     await this.cacheInvalidationService.invalidate('task', 'UPDATE', taskId);
 
     const response = TaskResponseDto.fromDocument(result);
     
-    // Broadcast updates
     this.socketServer.emitToRoom('tasks:all', SocketEvents.TASK_UPDATED, response);
     if (previousTask?.owner) {
       this.socketServer.emitToRoom(`tasks:owner:${previousTask.owner}`, SocketEvents.TASK_UPDATED, response);

@@ -24,6 +24,7 @@ export const embeddingQueue = new Queue(EMBEDDING_QUEUE_NAME, {
  */
 export interface EmbeddingJobData {
   meetingId: string;
+  userId: string;
   text: string;
   summary: string;
   decisions: string[];

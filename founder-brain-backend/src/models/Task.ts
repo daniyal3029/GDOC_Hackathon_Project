@@ -4,6 +4,7 @@ import mongoose, { Schema, Document } from 'mongoose';
  * Interface for Task Document.
  */
 export interface ITask {
+  userId: mongoose.Types.ObjectId;
   description: string;
   owner?: string | null;
   deadline?: Date | null;
@@ -19,6 +20,7 @@ export interface ITaskDocument extends ITask, Document {}
 
 const taskSchema = new Schema<ITaskDocument>(
   {
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     description: { type: String, required: true },
     owner: { type: String, default: null },
     deadline: { type: Date, default: null },
@@ -38,6 +40,7 @@ const taskSchema = new Schema<ITaskDocument>(
 taskSchema.index({ meetingId: 1 });
 taskSchema.index({ status: 1 });
 taskSchema.index({ owner: 1 });
+taskSchema.index({ userId: 1 });
 
 export const Task = mongoose.model<ITaskDocument>('Task', taskSchema);
 export default Task;

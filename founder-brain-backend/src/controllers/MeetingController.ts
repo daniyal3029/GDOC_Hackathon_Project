@@ -24,14 +24,15 @@ export class MeetingController {
   processMeeting = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const validated = CreateMeetingRequestSchema.parse(req.body);
+      const userId = (req as any).user.userId;
       
-      this.logger.info('Processing meeting request received', { textLength: validated.text.length });
+      this.logger.info('Processing meeting request received', { textLength: validated.text.length, userId });
 
       const key = (req as any).idempotencyKey;
       
       if (this.idempotencyService && key) {
         const result = await this.idempotencyService.process(key, req, async () => {
-          return await this.meetingService.processMeetingAsync(validated.text);
+          return await this.meetingService.processMeetingAsync(userId, validated.text);
         });
 
         if (result.status === 'processing') {
@@ -53,7 +54,7 @@ export class MeetingController {
           throw result.error;
         }
       } else {
-        const result = await this.meetingService.processMeetingAsync(validated.text);
+        const result = await this.meetingService.processMeetingAsync(userId, validated.text);
         res.status(202).json(ApiResponse.success({
           ...result,
           status: 'queued'
@@ -94,7 +95,6 @@ export class MeetingController {
     }
   };
 
-  // Necessary to access repository for getMeeting because service only returns document in one method
   private get meetingRepository() {
     return (this.meetingService as any).meetingRepository;
   }
@@ -104,9 +104,11 @@ export class MeetingController {
    */
   getMeetings = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const userId = (req as any).user.userId;
       const validated = MeetingFiltersRequestSchema.parse({
         ...req.query,
-        ...(req as any).pagination
+        ...(req as any).pagination,
+        userId
       });
       
       const result = await this.meetingService.getMeetings(validated, validated);
@@ -125,7 +127,8 @@ export class MeetingController {
    */
   getMeetingStats = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const stats = await this.meetingService.getMeetingStatistics();
+      const userId = (req as any).user.userId;
+      const stats = await this.meetingService.getMeetingStatistics(userId);
       return res.status(200).json(ApiResponse.success(stats));
     } catch (error) {
       next(error);

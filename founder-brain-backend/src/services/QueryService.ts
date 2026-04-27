@@ -23,9 +23,8 @@ export class QueryService implements IQueryService {
     this.genAI = new GoogleGenerativeAI(config.GEMINI_API_KEY);
   }
 
-  async askQuestion(question: string, options: any = {}): Promise<QueryResponse> {
+  async askQuestion(question: string, userId: string, options: any = {}): Promise<QueryResponse> {
     const startTime = Date.now();
-    const userId = options.userId || 'anonymous';
     
     // Normalize and hash question for caching
     const normalizedQuestion = question.toLowerCase().trim().replace(/\s+/g, ' ');
@@ -42,11 +41,11 @@ export class QueryService implements IQueryService {
       } as any;
     }
 
-    this.logger.info('Processing new semantic query via Gemini', { question });
+    this.logger.info('Processing new semantic query via Gemini', { question, userId });
 
     // 2. Search for relevant context
     const maxChunks = options.maxSources || config.MAX_CONTEXT_CHUNKS || 5;
-    const contextResults = await this.vectorService.searchContext(question, maxChunks);
+    const contextResults = await this.vectorService.searchContext(question, userId, maxChunks);
 
     if (contextResults.length === 0) {
       return {
@@ -109,8 +108,8 @@ export class QueryService implements IQueryService {
     }
   }
 
-  async streamAnswer(question: string, onToken: (token: string) => void): Promise<void> {
-    const contextResults = await this.vectorService.searchContext(question);
+  async streamAnswer(question: string, userId: string, onToken: (token: string) => void): Promise<void> {
+    const contextResults = await this.vectorService.searchContext(question, userId);
     
     if (contextResults.length === 0) {
       onToken("I couldn't find any relevant information.");
