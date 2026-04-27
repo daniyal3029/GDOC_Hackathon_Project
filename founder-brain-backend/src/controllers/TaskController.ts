@@ -23,12 +23,14 @@ export class TaskController {
    */
   getTasks = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const userId = (req as any).user.userId;
       const validated = TaskFiltersRequestSchema.parse({
         ...req.query,
-        ...(req as any).pagination
+        ...(req as any).pagination,
+        userId
       });
       
-      const result = await this.taskService.getTasks(validated as any, validated as any);
+      const result = await this.taskService.getTasks(userId, validated as any, validated as any);
       
       return res.status(200).json(ApiResponse.paginated(
         result.data,
@@ -44,7 +46,8 @@ export class TaskController {
    */
   getPendingGrouped = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const grouped = await this.taskService.getPendingTasksGrouped();
+      const userId = (req as any).user.userId;
+      const grouped = await this.taskService.getPendingTasksGrouped(userId);
       const responseDto = createGroupedTasksResponse(grouped);
       return res.status(200).json(ApiResponse.success(responseDto));
     } catch (error) {

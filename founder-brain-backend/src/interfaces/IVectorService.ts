@@ -7,6 +7,7 @@ export interface IVectorService {
    */
   indexMeeting(
     meetingId: string, 
+    userId: string,
     text: string, 
     summary: string, 
     decisions: string[]
@@ -17,6 +18,7 @@ export interface IVectorService {
    */
   searchContext(
     query: string, 
+    userId: string,
     limit?: number
   ): Promise<Array<{
     text: string;

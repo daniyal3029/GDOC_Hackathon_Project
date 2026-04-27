@@ -8,6 +8,7 @@ import { startMetricsAggregationWorker, scheduleMetricsAggregationJob } from '..
 import { startLogCleanupWorker, scheduleLogCleanupJob } from '../jobs/logCleanupJob';
 
 let worker: Worker | null = null;
+let emailQueueWorker: Worker | null = null;
 let cleanupWorker: Worker | null = null;
 let securityWorker: Worker | null = null;
 let metricsWorker: Worker | null = null;
@@ -18,7 +19,58 @@ let logCleanupWorker: Worker | null = null;
  */
 export const startWorker = async (): Promise<void> => {
   const logger = container.resolve<any>('Logger');
-  logger.info('Background workers disabled (using inline execution instead)');
+  const idempotencyRepository = container.resolve<any>('IdempotencyRepository');
+
+  // 1. Meeting Processing Worker
+  worker = new Worker(
+    'meeting-processing',
+    async (job) => {
+      await meetingWorker.process(job);
+    },
+    {
+      connection: redisClient,
+      concurrency: config.MAX_CONCURRENT_JOBS || 5,
+    }
+  );
+
+  worker.on('failed', (job, err) => {
+    logger.error(`Worker job ${job?.id} failed`, { error: err.message });
+  });
+
+  // 1b. Email Notification Worker
+  const emailWorker = container.getEmailWorker();
+  emailQueueWorker = new Worker(
+    'email-notifications',
+    async (job) => {
+      await emailWorker.process(job);
+    },
+    {
+      connection: redisClient,
+      concurrency: 5,
+    }
+  );
+
+  emailQueueWorker.on('failed', (job, err) => {
+    logger.error(`Email job ${job?.id} failed`, { error: err.message, email: job?.data?.email });
+  });
+
+  // 2. Maintenance / Cleanup Worker
+  cleanupWorker = startCleanupWorker(idempotencyRepository);
+  await scheduleCleanupJob();
+
+  // 3. Security / Abuse Scan Worker
+  securityWorker = startSecurityWorker();
+  await scheduleSecurityJob();
+
+  // 4. Metrics Aggregation Worker
+  metricsWorker = startMetricsAggregationWorker();
+  await scheduleMetricsAggregationJob();
+
+  // 5. Log Cleanup Worker
+  logCleanupWorker = startLogCleanupWorker();
+  await scheduleLogCleanupJob();
+
+  logger.info('Background workers started', { concurrency: config.MAX_CONCURRENT_JOBS || 5 });
 };
 
 /**
@@ -26,11 +78,17 @@ export const startWorker = async (): Promise<void> => {
  */
 export const stopWorker = async (): Promise<void> => {
   const logger = container.resolve<any>('Logger');
-  
+
   if (worker) {
     logger.info('Stopping meeting worker gracefully...');
     await worker.close();
     worker = null;
+  }
+
+  if (emailQueueWorker) {
+    logger.info('Stopping email worker gracefully...');
+    await emailQueueWorker.close();
+    emailQueueWorker = null;
   }
 
   if (cleanupWorker) {

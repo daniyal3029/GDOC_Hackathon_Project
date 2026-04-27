@@ -22,30 +22,21 @@ export class MeetingService implements IMeetingService {
     private logger: ILogger
   ) {}
 
-  async processMeetingAsync(text: string): Promise<{ jobId: string; meetingId: string }> {
-    // 1. Create meeting document within a transaction to ensure jobId update is atomic if we want,
-    // but here the job adding might fail.
-    
-    // Using transaction for initial creation + initial status
+  async processMeetingAsync(userId: string, text: string): Promise<{ jobId: string; meetingId: string }> {
     const result = await runTransaction(async (session) => {
       const meeting = await this.meetingRepository.create({
+        userId: userId as any,
         rawText: text,
         processingStatus: 'pending',
       }, { session });
 
       const meetingId = (meeting._id as any).toString();
 
-      // 2. Add job to queue
       try {
-        const job = await addMeetingJob(meetingId, text);
-        
-        // Update meeting withJobID
+        const job = await addMeetingJob(meetingId, userId, text);
         meeting.jobId = job.id;
         await meeting.save({ session });
-
-        // Record metric
         meetingsProcessedTotal.inc({ status: 'pending' });
-
         return { jobId: job.id as string, meetingId };
       } catch (error) {
         meetingsProcessedTotal.inc({ status: 'failed' });
@@ -54,9 +45,7 @@ export class MeetingService implements IMeetingService {
       }
     });
 
-    // Invalidate list caches as new meeting created
     await this.cacheInvalidationService.invalidate('meeting', 'CREATE');
-
     return result;
   }
 
@@ -108,8 +97,8 @@ export class MeetingService implements IMeetingService {
     };
   }
 
-  async getMeetingStatistics(): Promise<any> {
-    return await this.meetingRepository.getStatistics();
+  async getMeetingStatistics(userId: string): Promise<any> {
+    return await this.meetingRepository.getStatistics(userId);
   }
 
   async getMeetingWithTaskProgress(meetingId: string): Promise<any> {

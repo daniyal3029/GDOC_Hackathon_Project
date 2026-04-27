@@ -1,7 +1,6 @@
 import request from 'supertest';
 import app from '../../../src/app';
 import mongoose from 'mongoose';
-import { redisClient } from '../../../src/config/redis';
 
 // Mock meeting queue
 jest.mock('../../../src/queues/meetingQueue', () => ({
@@ -14,12 +13,12 @@ describe('Meeting API Integration Tests', () => {
     it('should return 202 and jobId for valid input', async () => {
       const response = await request(app)
         .post('/api/meetings/process')
-        .set('Idempotency-Key', 'unique-key-1')
+        .set('Idempotency-Key', '123e4567-e89b-12d3-a456-426614174000')
         .send({ text: 'Valid meeting notes content for testing purposes.' });
 
       expect(response.status).toBe(202);
-      expect(response.body).toHaveProperty('jobId');
-      expect(response.body).toHaveProperty('meetingId');
+      expect(response.body.data).toHaveProperty('jobId');
+      expect(response.body.data).toHaveProperty('meetingId');
     });
 
     it('should return 400 for empty text', async () => {
@@ -32,7 +31,7 @@ describe('Meeting API Integration Tests', () => {
 
     it('should return cached response for duplicate idempotency key', async () => {
       const payload = { text: 'Testing idempotency.' };
-      const key = 'idem-test-123';
+      const key = '123e4567-e89b-12d3-a456-426614174001';
 
       const res1 = await request(app)
         .post('/api/meetings/process')
@@ -47,7 +46,7 @@ describe('Meeting API Integration Tests', () => {
       expect(res1.status).toBe(202);
       expect(res2.status).toBe(202);
       expect(res2.header['idempotency-replayed']).toBe('true');
-      expect(res2.body.jobId).toBe(res1.body.jobId);
+      expect(res2.body.data.jobId).toBe(res1.body.data.jobId);
     });
   });
 

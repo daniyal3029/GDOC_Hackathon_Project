@@ -1,22 +1,21 @@
-import { MongoMemoryServer } from 'mongodb-memory-server';
+import { MongoMemoryReplSet } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 import RedisMock from 'ioredis-mock';
 
-let mongoServer: MongoMemoryServer;
+let replSet: MongoMemoryReplSet;
 
 // Set test environment
 process.env.NODE_ENV = 'test';
-process.env.MONGODB_URI = 'mongodb://127.0.0.1:27017/test';
 process.env.REDIS_URL = 'redis://localhost:6379';
-process.env.GEMINI_API_KEY = 'test-gemini-key';
-process.env.OPENAI_API_KEY = 'test-openai-key';
 
-// Mock uuid
+// 1. Mock problematic modules BEFORE anything else
 jest.mock('uuid', () => ({
-  v4: () => 'test-uuid-123',
+  v4: () => '123e4567-e89b-12d3-a456-426614174000',
+  validate: (val: string) => {
+    return val.length === 36; // Simple loose validation for mock
+  },
 }));
 
-// Mock ESM dependencies
 jest.mock('@xenova/transformers', () => ({
   pipeline: jest.fn(),
 }));
@@ -25,16 +24,18 @@ jest.mock('@lancedb/lancedb', () => ({
   connect: jest.fn(),
 }));
 
-// Mock performance-heavy or problematic middleware
-jest.mock('../../src/middleware/performanceMiddleware', () => ({
-  performanceMiddleware: () => (req: any, res: any, next: any) => next(),
+jest.mock('response-time', () => {
+  return jest.fn(() => (req: any, res: any, next: any) => next());
+});
+
+// Mock Redis
+const mockRedis = new RedisMock();
+jest.mock('../../src/config/redis', () => ({
+  redisClient: mockRedis,
+  disconnectRedis: jest.fn().mockResolvedValue(true),
 }));
 
-jest.mock('../../src/middleware/requestTracer', () => ({
-  requestTracerMiddleware: (req: any, res: any, next: any) => next(),
-}));
-
-// Mock Rate Limiters to pass through in tests
+// Mock the rate limiter middleware totally
 jest.mock('../../src/middleware/rateLimiter/globalRateLimit', () => ({
   globalRateLimiter: (req: any, res: any, next: any) => next(),
   blockListCheck: (req: any, res: any, next: any) => next(),
@@ -47,17 +48,19 @@ jest.mock('../../src/middleware/rateLimiter/endpointRateLimit', () => ({
   taskCompleteLimiter: (req: any, res: any, next: any) => next(),
 }));
 
-// Mock Redis module
-const mockRedis = new RedisMock();
-jest.mock('../../src/config/redis', () => ({
-  redisClient: mockRedis,
-  disconnectRedis: jest.fn().mockResolvedValue(true),
+// Mock tracing/performance
+jest.mock('../../src/middleware/performanceMiddleware', () => ({
+  performanceMiddleware: () => (req: any, res: any, next: any) => next(),
+}));
+
+jest.mock('../../src/middleware/requestTracer', () => ({
+  requestTracerMiddleware: (req: any, res: any, next: any) => next(),
 }));
 
 beforeAll(async () => {
-  // Start in-memory MongoDB
-  mongoServer = await MongoMemoryServer.create();
-  const uri = mongoServer.getUri();
+  // Use MongoMemoryReplSet to support Transactions
+  replSet = await MongoMemoryReplSet.create({ replSet: { storageEngine: 'wiredTiger' } });
+  const uri = replSet.getUri();
   
   if (mongoose.connection.readyState !== 0) {
     await mongoose.disconnect();
@@ -66,22 +69,19 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await mongoose.disconnect();
-  if (mongoServer) {
-    await mongoServer.stop();
+  await mongoose.connection.close();
+  if (replSet) {
+    await replSet.stop();
   }
 });
 
 beforeEach(async () => {
-  // Clear all database collections
-  const collections = mongoose.connection.collections;
-  for (const key in collections) {
-    await collections[key].deleteMany({});
+  if (mongoose.connection.db) {
+    const collections = await mongoose.connection.db.collections();
+    for (const collection of collections) {
+      await collection.deleteMany({});
+    }
   }
-
-  // Clear Redis mock
   await mockRedis.flushall();
-
-  // Clear all mocks
   jest.clearAllMocks();
 });

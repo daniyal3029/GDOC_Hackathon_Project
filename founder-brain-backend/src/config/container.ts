@@ -8,6 +8,7 @@ import { TaskRepository } from '../repositories/TaskRepository';
 import { VectorRepository } from '../repositories/VectorRepository';
 import { NotificationRepository } from '../repositories/NotificationRepository';
 import { IdempotencyRepository } from '../repositories/IdempotencyRepository';
+import { UserRepository } from '../repositories/UserRepository';
 
 // Services
 import { MeetingService } from '../services/MeetingService';
@@ -22,6 +23,12 @@ import { StreamingQueryService } from '../services/StreamingQueryService';
 import { CacheService } from '../services/CacheService';
 import { CacheInvalidationService } from '../services/CacheInvalidationService';
 import { IdempotencyService } from '../services/IdempotencyService';
+import { AuthService } from '../services/AuthService';
+import { TokenService } from '../services/TokenService';
+import { UserService } from '../services/UserService';
+import { EmailService } from '../services/EmailService';
+import { OTPService } from '../services/OTPService';
+import { CloudinaryService } from '../services/CloudinaryService';
 import { RateLimitMonitoringService } from '../services/RateLimitMonitoringService';
 import { SocketServer } from '../socket/SocketServer';
 
@@ -30,9 +37,11 @@ import { MeetingController } from '../controllers/MeetingController';
 import { TaskController } from '../controllers/TaskController';
 import { QueryController } from '../controllers/QueryController';
 import { NotificationController } from '../controllers/NotificationController';
+import { AuthController } from '../controllers/AuthController';
 
 // Others
 import { MeetingWorker } from '../workers/MeetingWorker';
+import { EmailWorker } from '../workers/EmailWorker';
 import { EmbeddingServiceFactory } from '../factories/EmbeddingServiceFactory';
 import { IndexManager } from '../repositories/optimization/IndexManager';
 
@@ -72,12 +81,14 @@ class Container {
       const vectorRepository = new VectorRepository();
       const notificationRepository = new NotificationRepository();
       const idempotencyRepository = new IdempotencyRepository();
+      const userRepository = new UserRepository();
 
       this.services.set('MeetingRepository', meetingRepository);
       this.services.set('TaskRepository', taskRepository);
       this.services.set('VectorRepository', vectorRepository);
       this.services.set('NotificationRepository', notificationRepository);
       this.services.set('IdempotencyRepository', idempotencyRepository);
+      this.services.set('UserRepository', userRepository);
 
       // 3. Independent & Infrastructure Services
       const cacheService = new CacheService(redisClient, logger);
@@ -88,6 +99,12 @@ class Container {
       const aiService = new AIService(logger);
       const embeddingService = EmbeddingServiceFactory.create(logger);
       const presenceService = new PresenceService(redisClient, logger);
+      const tokenService = new TokenService();
+      const userService = new UserService(userRepository);
+      const emailService = new EmailService(logger);
+      const otpService = new OTPService(redisClient, logger);
+      const cloudinaryService = new CloudinaryService(logger);
+      const authService = new AuthService(userRepository, tokenService, logger, otpService, emailService);
       
       // Socket Server (Ready for late attachment)
       const socketServer = new SocketServer(logger, presenceService);
@@ -100,6 +117,12 @@ class Container {
       this.services.set('AIService', aiService);
       this.services.set('EmbeddingService', embeddingService);
       this.services.set('PresenceService', presenceService);
+      this.services.set('TokenService', tokenService);
+      this.services.set('UserService', userService);
+      this.services.set('AuthService', authService);
+      this.services.set('EmailService', emailService);
+      this.services.set('OTPService', otpService);
+      this.services.set('CloudinaryService', cloudinaryService);
       this.services.set('SocketServer', socketServer);
 
       // 4. Dependent Services
@@ -119,18 +142,22 @@ class Container {
 
       // 5. Workers
       const meetingWorker = new MeetingWorker(aiService, meetingRepository, taskRepository, socketServer, logger);
+      const emailWorker = new EmailWorker(emailService, logger);
       this.services.set('MeetingWorker', meetingWorker);
+      this.services.set('EmailWorker', emailWorker);
 
       // 6. Controllers
       const meetingController = new MeetingController(meetingService, logger, idempotencyService);
       const taskController = new TaskController(taskService, logger, idempotencyService);
       const queryController = new QueryController(queryService, logger);
       const notificationController = new NotificationController(notificationService);
+      const authController = new AuthController(authService, userService);
 
       this.services.set('MeetingController', meetingController);
       this.services.set('TaskController', taskController);
       this.services.set('QueryController', queryController);
       this.services.set('NotificationController', notificationController);
+      this.services.set('AuthController', authController);
 
       logger.info('Dependency Injection Container initialized successfully.');
     } catch (error) {
@@ -172,7 +199,16 @@ class Container {
   getTaskService(): TaskService { return this.resolve('TaskService'); }
   getQueryService(): QueryService { return this.resolve('QueryService'); }
   getMeetingWorker(): MeetingWorker { return this.resolve('MeetingWorker'); }
+  getEmailWorker(): EmailWorker { return this.resolve('EmailWorker'); }
   getSocketServer(): SocketServer { return this.resolve('SocketServer'); }
+
+  getAuthService(): AuthService { return this.resolve('AuthService'); }
+  getTokenService(): TokenService { return this.resolve('TokenService'); }
+  getUserService(): UserService { return this.resolve('UserService'); }
+  getAuthController(): AuthController { return this.resolve('AuthController'); }
+  getOTPService(): OTPService { return this.resolve('OTPService'); }
+  getEmailService(): EmailService { return this.resolve('EmailService'); }
+  getCloudinaryService(): CloudinaryService { return this.resolve('CloudinaryService'); }
 }
 
 export const container = Container.getInstance();

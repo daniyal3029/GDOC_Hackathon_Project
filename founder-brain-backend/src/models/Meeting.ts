@@ -4,6 +4,7 @@ import mongoose, { Schema, Document } from 'mongoose';
  * Interface for Meeting Document.
  */
 export interface IMeeting {
+  userId: mongoose.Types.ObjectId;
   rawText: string;
   summary: string;
   decisions: string[];
@@ -28,6 +29,7 @@ export interface IMeetingDocument extends IMeeting, Document {}
 
 const meetingSchema = new Schema<IMeetingDocument>(
   {
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     rawText: { type: String, required: true },
     summary: { type: String, default: '' },
     decisions: { type: [String], default: [] },
@@ -58,6 +60,7 @@ const meetingSchema = new Schema<IMeetingDocument>(
 
 // Index for query performance
 meetingSchema.index({ processingStatus: 1 });
+meetingSchema.index({ userId: 1 });
 
 export const Meeting = mongoose.model<IMeetingDocument>('Meeting', meetingSchema);
 export default Meeting;

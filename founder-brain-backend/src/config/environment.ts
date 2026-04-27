@@ -74,6 +74,18 @@ interface Config {
   API_DESCRIPTION: string;
   API_VERSION: string;
   API_SERVER_URL: string;
+
+  // Phase 13 - Auth
+  JWT_ACCESS_SECRET: string;
+  JWT_REFRESH_SECRET: string;
+  JWT_ACCESS_EXPIRY: number;
+  JWT_REFRESH_EXPIRY: number;
+  BCRYPT_ROUNDS: number;
+  COOKIE_SECURE: boolean;
+  COOKIE_HTTP_ONLY: boolean;
+  COOKIE_SAME_SITE: 'lax' | 'strict' | 'none';
+  COOKIE_DOMAIN: string;
+  CSRF_SECRET: string;
 }
 
 /**
@@ -165,6 +177,18 @@ export const validateEnv = (): Config => {
     API_DESCRIPTION: process.env.API_DESCRIPTION || 'Meeting Intelligence with AI-powered task extraction',
     API_VERSION: process.env.API_VERSION || 'v1',
     API_SERVER_URL: process.env.API_SERVER_URL || 'http://localhost:3000',
+
+    // Phase 13 - Auth
+    JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET || 'fallback-access-secret-replace-in-prod',
+    JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || 'fallback-refresh-secret-replace-in-prod',
+    JWT_ACCESS_EXPIRY: parseInt(process.env.JWT_ACCESS_EXPIRY || '900', 10),
+    JWT_REFRESH_EXPIRY: parseInt(process.env.JWT_REFRESH_EXPIRY || '604800', 10),
+    BCRYPT_ROUNDS: parseInt(process.env.BCRYPT_ROUNDS || '12', 10),
+    COOKIE_SECURE: process.env.COOKIE_SECURE === 'true',
+    COOKIE_HTTP_ONLY: process.env.COOKIE_HTTP_ONLY !== 'false',
+    COOKIE_SAME_SITE: (process.env.COOKIE_SAME_SITE as any) || 'lax',
+    COOKIE_DOMAIN: process.env.COOKIE_DOMAIN || 'localhost',
+    CSRF_SECRET: process.env.CSRF_SECRET || 'fallback-csrf-secret-replace-in-prod',
   };
 };
 

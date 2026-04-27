@@ -3,6 +3,7 @@
  */
 export interface MeetingJobData {
   meetingId: string;
+  userId: string;
   text: string;
   idempotencyKey?: string;
 }
@@ -15,6 +16,15 @@ export interface JobStatusResponse {
   status: 'waiting' | 'active' | 'completed' | 'failed' | 'delayed';
   progress?: number;
   result?: any;
+}
+
+/**
+ * Data associated with an email job.
+ */
+export interface EmailJobData {
+  email: string;
+  otp: string;
+  type: 'SIGNUP' | 'RESET_PASSWORD';
 }
 
 /**
