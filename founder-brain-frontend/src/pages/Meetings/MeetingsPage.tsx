@@ -90,13 +90,13 @@ export const MeetingsPage: React.FC = () => {
 
             return (
               <motion.div
-                key={meeting._id}
+                key={meeting.id || meeting._id}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.04 }}
               >
                 <Link
-                  to={`/meetings/${meeting._id}`}
+                  to={`/meetings/${meeting.id || meeting._id}`}
                   className="group block bg-surface rounded-2xl p-5 glow-border hover:glow-border-hover transition-all duration-150"
                 >
                   <div className="flex items-start justify-between gap-4">

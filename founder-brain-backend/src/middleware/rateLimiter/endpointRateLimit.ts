@@ -1,5 +1,4 @@
 import rateLimit from 'express-rate-limit';
-import RedisStore from 'rate-limit-redis';
 import { redisClient } from '../../config/redis';
 import { rateLimitRules } from '../../config/rateLimitConfig';
 import { container } from '../../config/container';
@@ -19,10 +18,6 @@ const createLimiter = (config: any, prefix: string, endpointName: string) => {
     max: config.max,
     standardHeaders: true,
     legacyHeaders: false,
-    store: new RedisStore({
-      sendCommand: (...args: string[]) => (redisClient as any).call(...args),
-      prefix: `ratelimit:${prefix}:`,
-    }),
     message: {
       success: false,
       error: 'Too Many Requests',

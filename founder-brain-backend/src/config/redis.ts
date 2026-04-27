@@ -1,4 +1,4 @@
-import Redis from 'ioredis';
+import Redis from 'ioredis-mock';
 import config from './environment';
 import logger from './logger';
 

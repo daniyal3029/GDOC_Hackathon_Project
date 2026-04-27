@@ -274,8 +274,8 @@ export const DashboardPage: React.FC = () => {
           <div className="space-y-2">
             {meetings.map((meeting) => (
               <Link
-                key={meeting._id}
-                to={`/meetings/${meeting._id}`}
+                key={meeting.id || meeting._id}
+                to={`/meetings/${meeting.id || meeting._id}`}
                 className="group flex items-center justify-between p-4 bg-surface rounded-xl glow-border hover:glow-border-hover hover:bg-elevated transition-all duration-150"
               >
                 <div className="flex items-center gap-4 min-w-0">

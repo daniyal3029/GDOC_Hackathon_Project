@@ -27,17 +27,29 @@ export const meetingQueue = new Queue<MeetingJobData>(QUEUE_NAME, {
  * @param meetingId - The ID of the meeting document.
  * @param text - The raw meeting text.
  */
-export const addMeetingJob = async (meetingId: string, text: string): Promise<Job<MeetingJobData>> => {
+import { container } from '../config/container';
+
+export const addMeetingJob = async (meetingId: string, text: string): Promise<any> => {
   try {
-    const job = await meetingQueue.add(
-      'process-meeting',
-      { meetingId, text },
-      { jobId: `meeting-${meetingId}` } // Idempotency by meeting ID
-    );
-    logger.info('Meeting job added to queue', { jobId: job.id, meetingId });
-    return job;
+    const meetingWorker = container.getMeetingWorker();
+    
+    // Execute asynchronously in the background
+    setTimeout(async () => {
+      try {
+        await meetingWorker.process({ 
+          id: `meeting-${meetingId}`,
+          data: { meetingId, text },
+          updateProgress: async () => {}
+        } as any);
+      } catch (err) {
+        logger.error('Error processing meeting job', { error: err, meetingId });
+      }
+    }, 0);
+    
+    logger.info('Meeting job execution started', { meetingId });
+    return { id: `meeting-${meetingId}` } as any;
   } catch (error) {
-    logger.error('Error adding meeting job to queue', { error, meetingId });
+    logger.error('Error starting meeting job', { error, meetingId });
     throw error;
   }
 };

@@ -4,7 +4,12 @@ import type { Meeting, MeetingStatus, ProcessMeetingResponse, MeetingStats } fro
 
 export const meetingApi = {
   processMeeting: async (text: string) => {
-    const { data } = await api.post<ApiResponse<ProcessMeetingResponse>>('/meetings/process', { text });
+    const idempotencyKey = crypto.randomUUID();
+    const { data } = await api.post<ApiResponse<ProcessMeetingResponse>>('/meetings/process', { text }, {
+      headers: {
+        'Idempotency-Key': idempotencyKey
+      }
+    });
     return data.data;
   },
 

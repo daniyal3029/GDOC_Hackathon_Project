@@ -17,45 +17,8 @@ let logCleanupWorker: Worker | null = null;
  * Starts the background workers.
  */
 export const startWorker = async (): Promise<void> => {
-  if (worker) return;
-
-  const meetingWorker = container.getMeetingWorker();
   const logger = container.resolve<any>('Logger');
-  const idempotencyRepository = container.resolve<any>('IdempotencyRepository');
-
-  // 1. Meeting Processing Worker
-  worker = new Worker(
-    'meeting-processing',
-    async (job) => {
-      await meetingWorker.process(job);
-    },
-    {
-      connection: redisClient,
-      concurrency: config.MAX_CONCURRENT_JOBS || 5,
-    }
-  );
-
-  worker.on('failed', (job, err) => {
-    logger.error(`Worker job ${job?.id} failed`, { error: err.message });
-  });
-
-  // 2. Maintenance / Cleanup Worker
-  cleanupWorker = startCleanupWorker(idempotencyRepository);
-  await scheduleCleanupJob();
-
-  // 3. Security / Abuse Scan Worker
-  securityWorker = startSecurityWorker();
-  await scheduleSecurityJob();
-
-  // 4. Metrics Aggregation Worker
-  metricsWorker = startMetricsAggregationWorker();
-  await scheduleMetricsAggregationJob();
-
-  // 5. Log Cleanup Worker
-  logCleanupWorker = startLogCleanupWorker();
-  await scheduleLogCleanupJob();
-
-  logger.info('Background workers started', { concurrency: config.MAX_CONCURRENT_JOBS || 5 });
+  logger.info('Background workers disabled (using inline execution instead)');
 };
 
 /**

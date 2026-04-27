@@ -7,7 +7,7 @@ import config from '../../config/environment';
 export const corsConfig = () => {
   const allowedOrigins = config.CORS_ORIGIN 
     ? config.CORS_ORIGIN.split(',').map(origin => origin.trim()) 
-    : ['http://localhost:5173', 'http://localhost:3000'];
+    : ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173', 'http://127.0.0.1:3000'];
 
   return cors({
     origin: (origin, callback) => {
@@ -20,7 +20,7 @@ export const corsConfig = () => {
     },
     credentials: true,
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Idempotency-Key'],
+    // allowedHeaders removed to allow all requested headers
     exposedHeaders: ['X-Cache', 'Idempotency-Replayed', 'RateLimit-Limit', 'RateLimit-Remaining', 'RateLimit-Reset', 'Retry-After'],
     maxAge: 86400, // 24 hours (cache preflight response)
   });

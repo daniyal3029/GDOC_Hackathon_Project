@@ -49,6 +49,19 @@ Return ONLY valid JSON with EXACTLY this structure (no other text):
 Meeting notes:
 ${text}`;
 
+    if (!config.GEMINI_API_KEY || config.GEMINI_API_KEY === 'your_gemini_api_key_here') {
+      logger.info('Using MOCK AI response because GEMINI_API_KEY is missing');
+      await new Promise(resolve => setTimeout(resolve, 3000)); // Simulate delay
+      return {
+        summary: "This is a mock summary of the meeting. The team discussed important product updates and Q3 planning.",
+        decisions: ["Proceed with mock data for local testing", "Finalize UI designs by Friday"],
+        tasks: [
+          { task: "Update the backend mock", owner: "Daniyal", deadline: "2024-12-31" },
+          { task: "Review the PR", owner: null, deadline: null }
+        ]
+      };
+    }
+
     let attempts = 0;
     const maxAttempts = 3;
 

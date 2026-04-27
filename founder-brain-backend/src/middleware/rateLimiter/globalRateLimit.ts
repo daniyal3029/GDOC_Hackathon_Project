@@ -1,5 +1,4 @@
 import rateLimit from 'express-rate-limit';
-import RedisStore from 'rate-limit-redis';
 import { redisClient } from '../../config/redis';
 import { rateLimitRules } from '../../config/rateLimitConfig';
 import { container } from '../../config/container';
@@ -22,10 +21,7 @@ export const globalRateLimiter = rateLimit({
   max: rateLimitRules.global.max,
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-  store: new RedisStore({
-    sendCommand: (...args: string[]) => (redisClient as any).call(...args),
-    prefix: 'ratelimit:global:',
-  }),
+
   message: {
     success: false,
     error: 'Too Many Requests',

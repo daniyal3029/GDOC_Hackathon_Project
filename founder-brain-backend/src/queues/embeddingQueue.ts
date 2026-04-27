@@ -32,9 +32,26 @@ export interface EmbeddingJobData {
 /**
  * Adds a meeting to the embedding queue.
  */
+import { container } from '../config/container';
+import { Meeting } from '../models/Meeting';
+
 export const addEmbeddingJob = async (data: EmbeddingJobData) => {
   try {
-    await embeddingQueue.add(`embedding-${data.meetingId}`, data);
+    const vectorService = container.resolve<any>('VectorService');
+    
+    setTimeout(async () => {
+      try {
+        logger.info('Processing embedding job synchronously', { meetingId: data.meetingId });
+        await Meeting.findByIdAndUpdate(data.meetingId, { embeddingStatus: 'processing' });
+        const chunkCount = await vectorService.indexMeeting(data.meetingId, data.text, data.summary, data.decisions);
+        await Meeting.findByIdAndUpdate(data.meetingId, { embeddingStatus: 'completed', embeddingChunksCount: chunkCount, lastEmbeddedAt: new Date() });
+        logger.info('Embedding job completed', { meetingId: data.meetingId, chunkCount });
+      } catch (err: any) {
+        logger.error('Embedding job failed', { meetingId: data.meetingId, error: err.message });
+        await Meeting.findByIdAndUpdate(data.meetingId, { embeddingStatus: 'failed' });
+      }
+    }, 0);
+    
     logger.info('Added embedding job for meeting', { meetingId: data.meetingId });
   } catch (error) {
     logger.error('Failed to add embedding job to queue', { error, meetingId: data.meetingId });
