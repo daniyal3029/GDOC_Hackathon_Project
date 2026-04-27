@@ -8,6 +8,7 @@ import { startMetricsAggregationWorker, scheduleMetricsAggregationJob } from '..
 import { startLogCleanupWorker, scheduleLogCleanupJob } from '../jobs/logCleanupJob';
 
 let worker: Worker | null = null;
+let emailQueueWorker: Worker | null = null;
 let cleanupWorker: Worker | null = null;
 let securityWorker: Worker | null = null;
 let metricsWorker: Worker | null = null;
@@ -37,6 +38,23 @@ export const startWorker = async (): Promise<void> => {
 
   worker.on('failed', (job, err) => {
     logger.error(`Worker job ${job?.id} failed`, { error: err.message });
+  });
+  
+  // 1b. Email Notification Worker
+  const emailWorker = container.getEmailWorker();
+  emailQueueWorker = new Worker(
+    'email-notifications',
+    async (job) => {
+      await emailWorker.process(job);
+    },
+    {
+      connection: redisClient,
+      concurrency: 5,
+    }
+  );
+  
+  emailQueueWorker.on('failed', (job, err) => {
+    logger.error(`Email job ${job?.id} failed`, { error: err.message, email: job?.data?.email });
   });
 
   // 2. Maintenance / Cleanup Worker
@@ -68,6 +86,12 @@ export const stopWorker = async (): Promise<void> => {
     logger.info('Stopping meeting worker gracefully...');
     await worker.close();
     worker = null;
+  }
+
+  if (emailQueueWorker) {
+    logger.info('Stopping email worker gracefully...');
+    await emailQueueWorker.close();
+    emailQueueWorker = null;
   }
 
   if (cleanupWorker) {

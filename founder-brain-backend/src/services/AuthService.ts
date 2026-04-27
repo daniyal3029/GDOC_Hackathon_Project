@@ -5,6 +5,7 @@ import { EmailService } from './EmailService';
 import { ILogger } from '../interfaces/ILogger';
 import bcrypt from 'bcrypt';
 import config from '../config/environment';
+import { addEmailJob } from '../queues/emailQueue';
 
 export class AuthService {
   constructor(
@@ -36,9 +37,9 @@ export class AuthService {
     }
 
     const otp = await this.otpService.generateOTP(email, 'SIGNUP');
-    await this.emailService.sendOTP(email, otp, 'SIGNUP');
+    await addEmailJob(email, otp, 'SIGNUP');
 
-    this.logger.info('OTP sent for user registration', { email });
+    this.logger.info('OTP queued for user registration', { email });
     return { message: 'Verification OTP sent to email' };
   }
 
@@ -98,7 +99,7 @@ export class AuthService {
     }
 
     const otp = await this.otpService.generateOTP(email, 'RESET_PASSWORD');
-    await this.emailService.sendOTP(email, otp, 'RESET_PASSWORD');
+    await addEmailJob(email, otp, 'RESET_PASSWORD');
     
     return { message: 'Password reset OTP sent to email' };
   }

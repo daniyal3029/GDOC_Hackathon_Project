@@ -41,6 +41,7 @@ import { AuthController } from '../controllers/AuthController';
 
 // Others
 import { MeetingWorker } from '../workers/MeetingWorker';
+import { EmailWorker } from '../workers/EmailWorker';
 import { EmbeddingServiceFactory } from '../factories/EmbeddingServiceFactory';
 import { IndexManager } from '../repositories/optimization/IndexManager';
 
@@ -141,7 +142,9 @@ class Container {
 
       // 5. Workers
       const meetingWorker = new MeetingWorker(aiService, meetingRepository, taskRepository, socketServer, logger);
+      const emailWorker = new EmailWorker(emailService, logger);
       this.services.set('MeetingWorker', meetingWorker);
+      this.services.set('EmailWorker', emailWorker);
 
       // 6. Controllers
       const meetingController = new MeetingController(meetingService, logger, idempotencyService);
@@ -196,6 +199,7 @@ class Container {
   getTaskService(): TaskService { return this.resolve('TaskService'); }
   getQueryService(): QueryService { return this.resolve('QueryService'); }
   getMeetingWorker(): MeetingWorker { return this.resolve('MeetingWorker'); }
+  getEmailWorker(): EmailWorker { return this.resolve('EmailWorker'); }
   getSocketServer(): SocketServer { return this.resolve('SocketServer'); }
 
   getAuthService(): AuthService { return this.resolve('AuthService'); }

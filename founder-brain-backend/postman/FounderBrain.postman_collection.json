@@ -6,613 +6,571 @@
   },
   "item": [
     {
-      "name": "/api/meetings",
+      "name": "Authentication",
       "item": [
         {
-          "name": "List all meetings with pagination",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Idempotency-Key",
-                "value": "{{idempotency_key}}",
-                "type": "text"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/meetings",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "meetings"
-              ]
-            },
-            "description": ""
-          }
-        }
-      ]
-    },
-    {
-      "name": "/api/meetings/stats",
-      "item": [
-        {
-          "name": "Get meeting statistics",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Idempotency-Key",
-                "value": "{{idempotency_key}}",
-                "type": "text"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/meetings/stats",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "meetings",
-                "stats"
-              ]
-            },
-            "description": ""
-          }
-        }
-      ]
-    },
-    {
-      "name": "/api/meetings/process",
-      "item": [
-        {
-          "name": "Queue a meeting for AI processing",
+          "name": "Register",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Idempotency-Key",
-                "value": "{{idempotency_key}}",
-                "type": "text"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
+              { "key": "Content-Type", "value": "application/json" }
             ],
-            "url": {
-              "raw": "{{base_url}}/api/meetings/process",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "meetings",
-                "process"
-              ]
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"Password123!\",\n  \"name\": \"John Doe\"\n}"
             },
-            "description": ""
-          }
-        }
-      ]
-    },
-    {
-      "name": "/api/meetings/{id}/status",
-      "item": [
-        {
-          "name": "Check processing status",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Idempotency-Key",
-                "value": "{{idempotency_key}}",
-                "type": "text"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
             "url": {
-              "raw": "{{base_url}}/api/meetings/{id}/status",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "meetings",
-                "{id}",
-                "status"
-              ]
-            },
-            "description": ""
-          }
-        }
-      ]
-    },
-    {
-      "name": "/api/meetings/{id}/progress",
-      "item": [
-        {
-          "name": "Get meeting details with task completion progress",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Idempotency-Key",
-                "value": "{{idempotency_key}}",
-                "type": "text"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/meetings/{id}/progress",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "meetings",
-                "{id}",
-                "progress"
-              ]
-            },
-            "description": ""
-          }
-        }
-      ]
-    },
-    {
-      "name": "/api/meetings/{id}",
-      "item": [
-        {
-          "name": "Get full meeting details",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Idempotency-Key",
-                "value": "{{idempotency_key}}",
-                "type": "text"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/meetings/{id}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "meetings",
-                "{id}"
-              ]
-            },
-            "description": ""
-          }
-        }
-      ]
-    },
-    {
-      "name": "/api/notifications",
-      "item": [
-        {
-          "name": "List notifications for the user",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Idempotency-Key",
-                "value": "{{idempotency_key}}",
-                "type": "text"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/notifications",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "notifications"
-              ]
-            },
-            "description": ""
-          }
-        }
-      ]
-    },
-    {
-      "name": "/api/notifications/unread/count",
-      "item": [
-        {
-          "name": "Get unread notification count",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Idempotency-Key",
-                "value": "{{idempotency_key}}",
-                "type": "text"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/notifications/unread/count",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "notifications",
-                "unread",
-                "count"
-              ]
-            },
-            "description": ""
-          }
-        }
-      ]
-    },
-    {
-      "name": "/api/notifications/{id}/read",
-      "item": [
-        {
-          "name": "Mark a notification as read",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Idempotency-Key",
-                "value": "{{idempotency_key}}",
-                "type": "text"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/notifications/{id}/read",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "notifications",
-                "{id}",
-                "read"
-              ]
-            },
-            "description": ""
-          }
-        }
-      ]
-    },
-    {
-      "name": "/api/notifications/read-all",
-      "item": [
-        {
-          "name": "Mark all notifications as read",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Idempotency-Key",
-                "value": "{{idempotency_key}}",
-                "type": "text"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/notifications/read-all",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "notifications",
-                "read-all"
-              ]
-            },
-            "description": ""
-          }
-        }
-      ]
-    },
-    {
-      "name": "/api/query",
-      "item": [
-        {
-          "name": "Ask a natural language question about meetings",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Idempotency-Key",
-                "value": "{{idempotency_key}}",
-                "type": "text"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/query",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "query"
-              ]
-            },
-            "description": ""
-          }
-        }
-      ]
-    },
-    {
-      "name": "/api/query/suggestions",
-      "item": [
-        {
-          "name": "Get suggested questions",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Idempotency-Key",
-                "value": "{{idempotency_key}}",
-                "type": "text"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/query/suggestions",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "query",
-                "suggestions"
-              ]
-            },
-            "description": ""
-          }
-        }
-      ]
-    },
-    {
-      "name": "/api/tasks",
-      "item": [
-        {
-          "name": "Get all tasks with filters and pagination",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Idempotency-Key",
-                "value": "{{idempotency_key}}",
-                "type": "text"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/tasks",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "tasks"
-              ]
-            },
-            "description": ""
-          }
-        }
-      ]
-    },
-    {
-      "name": "/api/tasks/pending/grouped",
-      "item": [
-        {
-          "name": "Get pending tasks grouped by owner",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Idempotency-Key",
-                "value": "{{idempotency_key}}",
-                "type": "text"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/tasks/pending/grouped",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "tasks",
-                "pending",
-                "grouped"
-              ]
-            },
-            "description": ""
-          }
-        }
-      ]
-    },
-    {
-      "name": "/api/tasks/{id}",
-      "item": [
-        {
-          "name": "Get a single task by ID",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Idempotency-Key",
-                "value": "{{idempotency_key}}",
-                "type": "text"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/tasks/{id}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "tasks",
-                "{id}"
-              ]
-            },
-            "description": ""
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            }
           }
         },
         {
-          "name": "Update task fields",
+          "name": "Verify Signup",
           "request": {
-            "method": "PATCH",
+            "method": "POST",
             "header": [
-              {
-                "key": "Idempotency-Key",
-                "value": "{{idempotency_key}}",
-                "type": "text"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/verify-signup",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "verify-signup"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data.accessToken) {",
+                  "    pm.collectionVariables.set(\"token\", jsonData.data.accessToken);",
+                  "    pm.collectionVariables.set(\"refresh_token\", jsonData.data.refreshToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
               }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
             ],
             "url": {
-              "raw": "{{base_url}}/api/tasks/{id}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "tasks",
-                "{id}"
-              ]
+              "raw": "{{base_url}}/api/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}"
             },
-            "description": ""
+            "url": {
+              "raw": "{{base_url}}/api/auth/refresh",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "refresh"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "logout"]
+            }
+          }
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/forgot-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "forgot-password"]
+            }
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"otp\": \"123456\",\n  \"newPassword\": \"NewPassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/reset-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "reset-password"]
+            }
           }
         }
       ]
     },
     {
-      "name": "/api/tasks/{id}/complete",
+      "name": "Meetings",
       "item": [
         {
-          "name": "Mark a task as completed",
+          "name": "List Meetings",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/meetings?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "meetings"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Meeting Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/meetings/stats",
+              "host": ["{{base_url}}"],
+              "path": ["api", "meetings", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Process Meeting",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Idempotency-Key",
-                "value": "{{idempotency_key}}",
-                "type": "text"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Strategy Session\",\n  \"audioUrl\": \"https://example.com/audio.mp3\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/meetings/process",
+              "host": ["{{base_url}}"],
+              "path": ["api", "meetings", "process"]
+            }
+          }
+        },
+        {
+          "name": "Get Meeting Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
             ],
             "url": {
-              "raw": "{{base_url}}/api/tasks/{id}/complete",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "tasks",
-                "{id}",
-                "complete"
+              "raw": "{{base_url}}/api/meetings/:id/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "meetings", ":id", "status"],
+              "variable": [
+                { "key": "id", "value": "meeting_id_here" }
               ]
+            }
+          }
+        },
+        {
+          "name": "Get Meeting Progress",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/meetings/:id/progress",
+              "host": ["{{base_url}}"],
+              "path": ["api", "meetings", ":id", "progress"],
+              "variable": [
+                { "key": "id", "value": "meeting_id_here" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Meeting Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/meetings/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "meetings", ":id"],
+              "variable": [
+                { "key": "id", "value": "meeting_id_here" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "List Tasks",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/tasks?status=pending&page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tasks"],
+              "query": [
+                { "key": "status", "value": "pending" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Pending Tasks Grouped",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/tasks/pending/grouped",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tasks", "pending", "grouped"]
+            }
+          }
+        },
+        {
+          "name": "Get Task Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/tasks/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tasks", ":id"],
+              "variable": [
+                { "key": "id", "value": "task_id_here" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Task",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"in_progress\",\n  \"priority\": \"high\"\n}"
             },
-            "description": ""
+            "url": {
+              "raw": "{{base_url}}/api/tasks/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tasks", ":id"],
+              "variable": [
+                { "key": "id", "value": "task_id_here" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Complete Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/tasks/:id/complete",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tasks", ":id", "complete"],
+              "variable": [
+                { "key": "id", "value": "task_id_here" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "AI Query",
+      "item": [
+        {
+          "name": "Ask Question",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"What were the main action items from the last meeting?\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/query",
+              "host": ["{{base_url}}"],
+              "path": ["api", "query"]
+            }
+          }
+        },
+        {
+          "name": "Get Suggestions",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/query/suggestions",
+              "host": ["{{base_url}}"],
+              "path": ["api", "query", "suggestions"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "List Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/notifications",
+              "host": ["{{base_url}}"],
+              "path": ["api", "notifications"]
+            }
+          }
+        },
+        {
+          "name": "Unread Count",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/notifications/unread/count",
+              "host": ["{{base_url}}"],
+              "path": ["api", "notifications", "unread", "count"]
+            }
+          }
+        },
+        {
+          "name": "Mark as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/notifications/:id/read",
+              "host": ["{{base_url}}"],
+              "path": ["api", "notifications", ":id", "read"],
+              "variable": [
+                { "key": "id", "value": "notification_id_here" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mark All as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/notifications/read-all",
+              "host": ["{{base_url}}"],
+              "path": ["api", "notifications", "read-all"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "System Monitoring",
+      "item": [
+        {
+          "name": "Basic Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "Liveness Probe",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/live",
+              "host": ["{{base_url}}"],
+              "path": ["live"]
+            }
+          }
+        },
+        {
+          "name": "Readiness Probe",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ready",
+              "host": ["{{base_url}}"],
+              "path": ["ready"]
+            }
+          }
+        },
+        {
+          "name": "Detailed Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health/detailed",
+              "host": ["{{base_url}}"],
+              "path": ["health", "detailed"]
+            }
+          }
+        },
+        {
+          "name": "Prometheus Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/metrics",
+              "host": ["{{base_url}}"],
+              "path": ["metrics"]
+            }
+          }
+        },
+        {
+          "name": "Admin Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/dashboard",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "dashboard"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Documentation",
+      "item": [
+        {
+          "name": "Swagger UI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api-docs",
+              "host": ["{{base_url}}"],
+              "path": ["api-docs"]
+            }
+          }
+        },
+        {
+          "name": "OpenAPI Specification (JSON)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api-docs/api-docs.json",
+              "host": ["{{base_url}}"],
+              "path": ["api-docs", "api-docs.json"]
+            }
           }
         }
       ]
     }
   ],
   "variable": [
-    {
-      "key": "base_url",
-      "value": "http://localhost:3000",
-      "type": "string"
-    },
-    {
-      "key": "idempotency_key",
-      "value": "unique-key-123",
-      "type": "string"
-    },
-    {
-      "key": "token",
-      "value": "your-jwt-token",
-      "type": "string"
-    }
+    { "key": "base_url", "value": "http://localhost:3000", "type": "string" },
+    { "key": "token", "value": "your-jwt-access-token", "type": "string" },
+    { "key": "refresh_token", "value": "your-jwt-refresh-token", "type": "string" }
   ]
 }

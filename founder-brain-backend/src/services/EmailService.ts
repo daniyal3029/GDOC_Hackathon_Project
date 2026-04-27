@@ -6,15 +6,27 @@ export class EmailService {
   private transporter: nodemailer.Transporter;
 
   constructor(private logger: ILogger) {
-    this.transporter = nodemailer.createTransport({
-      host: config.NODE_ENV === 'production' ? process.env.MAIL_HOST : 'smtp.ethereal.email',
-      port: 587,
-      secure: false, // true for 465, false for other ports
+    const host = process.env.MAIL_HOST || (config.NODE_ENV === 'production' ? '' : 'smtp.ethereal.email');
+    const transportConfig: any = {
+      host,
+      port: parseInt(process.env.MAIL_PORT || '587', 10),
+      secure: process.env.MAIL_SECURE === 'true', // port 465
       auth: {
-        user: process.env.MAIL_USER || 'shahzadkhichi996@gmail.com',
-        pass: process.env.MAIL_PASS || 'yowt kkwr tufq rgan',
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS,
       },
-    });
+    };
+
+    if (host.includes('gmail.com')) {
+      transportConfig.service = 'gmail';
+      // When using 'service: gmail', host/port/secure are handled by nodemailer
+      delete transportConfig.host;
+      delete transportConfig.port;
+      delete transportConfig.secure;
+    }
+
+    this.transporter = nodemailer.createTransport(transportConfig);
+    this.logger.info('Email service initialized', { host: process.env.MAIL_HOST || 'ethereal' });
   }
 
   async sendOTP(email: string, otp: string, type: 'SIGNUP' | 'RESET_PASSWORD'): Promise<void> {

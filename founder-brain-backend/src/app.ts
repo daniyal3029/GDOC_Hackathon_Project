@@ -30,8 +30,7 @@ import { wsSecurityHeaders } from './socket/securityHeaders';
 import { requestTracerMiddleware } from './middleware/requestTracer';
 import { metricsMiddleware } from './middleware/metricsMiddleware';
 
-// Phase 13 Auth & CSRF
-import { doubleCsrfProtection, generateCsrfToken } from './middleware/csrf';
+// Phase 13 Auth
 
 /**
  * Express Application setup.
@@ -78,22 +77,11 @@ app.use(globalRateLimiter);
 // 9. Body Parsers & Input Sanitization
 app.use(sanitizationPipeline);
 
-// 10. CSRF Protection (Applied after body parsing)
-app.get('/api/auth/csrf-token', (req: Request, res: Response) => {
-  const token = generateCsrfToken(req, res);
-  res.json({ success: true, token });
-});
-app.use(doubleCsrfProtection);
-
-// 11. Global Cache Middleware
+// 10. Global Cache Middleware
 const cacheService = container.getCacheService();
 app.use(cacheMiddleware(cacheService));
 
-// 12. Idempotency Middleware
-const idempotencyService = container.getIdempotencyService();
-app.use(idempotencyMiddleware(idempotencyService));
-
-// 13. Routes
+// 12. Routes
 app.get('/health', healthCheck);
 app.use('/', metricsRoutes);
 app.use('/admin', adminRoutes);

@@ -19,6 +19,15 @@ export interface JobStatusResponse {
 }
 
 /**
+ * Data associated with an email job.
+ */
+export interface EmailJobData {
+  email: string;
+  otp: string;
+  type: 'SIGNUP' | 'RESET_PASSWORD';
+}
+
+/**
  * Health check response for a meeting.
  */
 export interface MeetingStatusResponse {
