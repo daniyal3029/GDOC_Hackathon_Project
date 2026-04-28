@@ -87,13 +87,7 @@ export const TaskBoardPage: React.FC = () => {
     },
   });
 
-  const _toggleSelect = (id: string) => {
-    setSelectedTasks((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-  };
+
 
   const handleBulkComplete = () => {
     selectedTasks.forEach((id) => {
