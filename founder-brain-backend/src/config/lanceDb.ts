@@ -30,28 +30,27 @@ export const initLanceDb = async (): Promise<void> => {
       
       // Define schema using Apache Arrow
       const schema = new arrow.Schema([
-        new arrow.Field('vector', new arrow.Float32()),
+        new arrow.Field('vector', new arrow.FixedSizeList(config.EMBEDDING_DIMENSION, new arrow.Field('item', new arrow.Float32()))),
         new arrow.Field('text', new arrow.Utf8()),
         new arrow.Field('meetingId', new arrow.Utf8()),
+        new arrow.Field('userId', new arrow.Utf8()),
         new arrow.Field('chunkIndex', new arrow.Int32()),
         new arrow.Field('metadata', new arrow.Utf8()),
       ]);
 
-      // Create an empty table with the defined schema
-      // In @lancedb/lancedb v0.4.x+, we can create an empty table by passing schema
-      // but the API varies. A safer way is to provide dummy data if needed or just use simple objects.
-      // LanceDB can infer schema from the first row of data.
-      
       const dummyData = [
         {
-          vector: new Float32Array(config.EMBEDDING_DIMENSION).fill(0),
+          vector: Array.from(new Float32Array(config.EMBEDDING_DIMENSION).fill(0)),
           text: 'initialization',
           meetingId: 'init',
+          userId: 'system',
           chunkIndex: -1,
           metadata: JSON.stringify({}),
         }
       ];
       
+      // In latest lancedb, if we provide data, schema is inferred. But to be safe we can ignore explicit schema
+      // If we just pass data, we MUST ensure userId is present, which we did. I will just rely on dummyData parsing.
       await db.createTable(TABLE_NAME, dummyData);
       logger.info(`Table ${TABLE_NAME} created successfully`);
     }

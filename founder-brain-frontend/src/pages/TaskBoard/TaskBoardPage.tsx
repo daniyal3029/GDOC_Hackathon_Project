@@ -3,13 +3,13 @@ import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  CheckCircle2, Clock, Search, Filter, X,
-  CheckSquare, AlertTriangle, ListChecks,
+  CheckCircle2, Search, X,
+  ListChecks,
 } from 'lucide-react';
 import { taskApi } from '../../services/api/taskApi';
 import { useDebounce } from '../../hooks';
 import { useNotificationStore } from '../../stores/notificationStore';
-import { format, formatDistanceToNow } from '../../utils/dateFormatter';
+import { format } from '../../utils/dateFormatter';
 import { cn, getDeadlineBg } from '../../utils/constants';
 import { SkeletonList } from '../../components/shared/SkeletonLoader';
 import type { Task } from '../../types/meeting.types';
@@ -87,7 +87,7 @@ export const TaskBoardPage: React.FC = () => {
     },
   });
 
-  const toggleSelect = (id: string) => {
+  const _toggleSelect = (id: string) => {
     setSelectedTasks((prev) => {
       const next = new Set(prev);
       next.has(id) ? next.delete(id) : next.add(id);

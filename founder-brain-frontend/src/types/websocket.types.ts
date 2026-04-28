@@ -46,21 +46,23 @@ export interface WSQueryError {
   message: string;
 }
 
-export enum SocketEvent {
-  CONNECT = 'connection',
-  DISCONNECT = 'disconnect',
-  MEETING_STATUS = 'meeting:status',
-  MEETING_COMPLETED = 'meeting:completed',
-  MEETING_FAILED = 'meeting:failed',
-  TASK_CREATED = 'task:created',
-  TASK_COMPLETED = 'task:completed',
-  TASK_UPDATED = 'task:updated',
-  QUERY_ASK = 'query:ask',
-  QUERY_CHUNK = 'query:chunk',
-  QUERY_COMPLETE = 'query:complete',
-  QUERY_ERROR = 'query:error',
-  JOIN_ROOM = 'join:room',
-  LEAVE_ROOM = 'leave:room',
-  NOTIFICATION_NEW = 'notification:new',
-  NOTIFICATION_COUNT = 'notification:count',
-}
+export const SocketEvent = {
+  CONNECT: 'connection',
+  DISCONNECT: 'disconnect',
+  MEETING_STATUS: 'meeting:status',
+  MEETING_COMPLETED: 'meeting:completed',
+  MEETING_FAILED: 'meeting:failed',
+  TASK_CREATED: 'task:created',
+  TASK_COMPLETED: 'task:completed',
+  TASK_UPDATED: 'task:updated',
+  QUERY_ASK: 'query:ask',
+  QUERY_CHUNK: 'query:chunk',
+  QUERY_COMPLETE: 'query:complete',
+  QUERY_ERROR: 'query:error',
+  JOIN_ROOM: 'join:room',
+  LEAVE_ROOM: 'leave:room',
+  NOTIFICATION_NEW: 'notification:new',
+  NOTIFICATION_COUNT: 'notification:count',
+} as const;
+
+export type SocketEvent = typeof SocketEvent[keyof typeof SocketEvent];

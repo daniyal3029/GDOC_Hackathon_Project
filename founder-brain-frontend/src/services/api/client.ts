@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useNotificationStore } from '../../stores/notificationStore';
+import { useAuthStore } from '../../stores/authStore';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 const DEMO_USER_ID = import.meta.env.VITE_DEMO_USER_ID || 'demo-user-001';
@@ -12,10 +13,16 @@ const api = axios.create({
   },
 });
 
-// Request interceptor — attach user ID header
+// Request interceptor — attach auth token
 api.interceptors.request.use(
   (config) => {
-    config.headers['X-User-Id'] = DEMO_USER_ID;
+    const token = useAuthStore.getState().token;
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    } else {
+      // Fallback for development if no token exists
+      config.headers['X-User-Id'] = DEMO_USER_ID;
+    }
     return config;
   },
   (error) => Promise.reject(error)

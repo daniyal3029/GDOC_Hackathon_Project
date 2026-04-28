@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -218,7 +218,7 @@ export const InputMeetingPage: React.FC = () => {
                       const isDone = i < currentStepIdx;
                       const isActive = i === currentStepIdx && currentStep !== 'completed';
                       const isCurrent = step.key === currentStep;
-                      const isFailed = currentStep === 'failed' && isActive;
+
 
                       return (
                         <div

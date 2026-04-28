@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import {
   Search, Plus, FileText, ArrowRight,
-  CheckCircle2, Clock, AlertCircle, ChevronLeft, ChevronRight, X,
+  ChevronLeft, ChevronRight, X,
 } from 'lucide-react';
 import { meetingApi } from '../../services/api/meetingApi';
 import { useDebounce } from '../../hooks';

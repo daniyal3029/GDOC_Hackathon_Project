@@ -15,6 +15,7 @@ export const startEmbeddingWorker = async () => {
     EMBEDDING_QUEUE_NAME,
     async (job: Job<EmbeddingJobData>) => {
       const { meetingId, userId, text, summary, decisions } = job.data;
+      const vectorService = container.resolve<VectorService>('VectorService');
 
       try {
         logger.info('Processing embedding job', { jobId: job.id, meetingId, userId });

@@ -12,9 +12,9 @@ import { meetingApi } from '../../services/api/meetingApi';
 import { taskApi } from '../../services/api/taskApi';
 import { useDemoStore } from '../../stores/demoStore';
 import { format, formatDistanceToNow } from '../../utils/dateFormatter';
-import { cn, getStatusDot, getDeadlineBg, truncate } from '../../utils/constants';
+import { cn, getStatusDot, truncate } from '../../utils/constants';
 import { SkeletonCard } from '../../components/shared/SkeletonLoader';
-import type { Meeting, Task } from '../../types/meeting.types';
+
 
 const chartData = Array.from({ length: 30 }, (_, i) => ({
   day: `Day ${i + 1}`,
@@ -44,7 +44,7 @@ export const DashboardPage: React.FC = () => {
     staleTime: 300_000,
   });
 
-  const { data: tasksData, isLoading: tasksLoading } = useQuery({
+  const { data: tasksData } = useQuery({
     queryKey: ['tasks', 'all'],
     queryFn: () => taskApi.getTasks({ limit: 100 }),
     staleTime: 60_000,

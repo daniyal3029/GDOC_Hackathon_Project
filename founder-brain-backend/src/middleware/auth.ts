@@ -7,6 +7,22 @@ const userRepository = container.resolve<any>('UserRepository');
 
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    // 1. Development Mode: Support X-User-Id for frontend demo
+    if (process.env.NODE_ENV === 'development' && req.headers['x-user-id']) {
+      const demoUserId = req.headers['x-user-id'] as string;
+      
+      // In a real app we'd verify the user exists, but for the hackathon connection
+      // we'll inject a mock user payload if the header is present.
+      (req as any).user = {
+        userId: demoUserId,
+        email: 'demo@founderbrain.ai',
+        role: 'user',
+        version: 0
+      };
+      
+      return next();
+    }
+
     const authHeader = req.headers.authorization;
     let token = '';
 

@@ -57,7 +57,6 @@ export class StreamingQueryService {
       const result = await model.generateContentStream(prompt);
       
       this.activeStreams.add(streamKey);
-
       let fullAnswer = '';
       
       for await (const chunk of result.stream) {
@@ -79,22 +78,16 @@ export class StreamingQueryService {
       }
 
       if (this.activeStreams.has(streamKey)) {
-        socket.emit(SocketEvents.QUERY_CHUNK, { 
-          requestId, 
-          token: '', 
-          isComplete: true 
-        });
-        
+        socket.emit(SocketEvents.QUERY_CHUNK, { requestId, token: '', isComplete: true });
         socket.emit(SocketEvents.QUERY_COMPLETE, {
           requestId,
-          answer: fullAnswer,
+          answer: fullAnswer.trim(),
           sources: relevantContext.map((c, i) => ({
             id: i + 1,
             meetingId: c.meetingId,
             textSnippet: c.text.substring(0, 100) + '...'
           }))
         });
-
         this.activeStreams.delete(streamKey);
       }
 

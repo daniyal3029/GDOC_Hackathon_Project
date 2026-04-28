@@ -3,13 +3,13 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import {
-  ArrowLeft, Calendar, Users, CheckCircle2, Clock,
+  ArrowLeft, Calendar, Users, CheckCircle2,
   Sparkles, Copy, Check, FileText, Lightbulb, ListChecks,
   AlertCircle,
 } from 'lucide-react';
 import { meetingApi } from '../../services/api/meetingApi';
 import { taskApi } from '../../services/api/taskApi';
-import { format, formatDistanceToNow } from '../../utils/dateFormatter';
+import { format } from '../../utils/dateFormatter';
 import { cn, getStatusDot, getDeadlineBg, getInitials, truncate } from '../../utils/constants';
 import { useNotificationStore } from '../../stores/notificationStore';
 import { SkeletonCard } from '../../components/shared/SkeletonLoader';

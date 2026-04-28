@@ -22,13 +22,14 @@ export const startWorker = async (): Promise<void> => {
   const idempotencyRepository = container.resolve<any>('IdempotencyRepository');
 
   // 1. Meeting Processing Worker
+  const meetingWorker = container.getMeetingWorker();
   worker = new Worker(
     'meeting-processing',
     async (job) => {
       await meetingWorker.process(job);
     },
     {
-      connection: redisClient,
+      connection: redisClient.duplicate(),
       concurrency: config.MAX_CONCURRENT_JOBS || 5,
     }
   );
@@ -45,7 +46,7 @@ export const startWorker = async (): Promise<void> => {
       await emailWorker.process(job);
     },
     {
-      connection: redisClient,
+      connection: redisClient.duplicate(),
       concurrency: 5,
     }
   );

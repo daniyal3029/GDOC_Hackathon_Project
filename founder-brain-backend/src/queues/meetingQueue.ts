@@ -25,44 +25,42 @@ export const meetingQueue = new Queue<MeetingJobData>(QUEUE_NAME, {
 /**
  * Adds a meeting processing job to the queue.
  * @param meetingId - The ID of the meeting document.
+ * @param userId - The ID of the user.
  * @param text - The raw meeting text.
  */
 export const addMeetingJob = async (meetingId: string, userId: string, text: string): Promise<Job<MeetingJobData>> => {
-  import { container } from '../config/container';
+  try {
+    const job = await meetingQueue.add(
+      'process-meeting',
+      { meetingId, userId, text },
+      { jobId: `meeting-${meetingId}` } // Idempotency by meeting ID
+    );
+    logger.info('Meeting job added to queue', { jobId: job.id, meetingId });
+    return job;
+  } catch (error) {
+    logger.error('Error starting meeting job', { error, meetingId });
+    throw error;
+  }
+};
 
-  export const addMeetingJob = async (meetingId: string, text: string): Promise<any> => {
-    try {
-      const job = await meetingQueue.add(
-        'process-meeting',
-        { meetingId, userId, text },
-        { jobId: `meeting-${meetingId}` } // Idempotency by meeting ID
-      );
-      logger.info('Meeting job added to queue', { jobId: job.id, meetingId });
-      return job;
-    } catch (error) {
-      logger.error('Error starting meeting job', { error, meetingId });
-      throw error;
-    }
-  };
+/**
+ * Retrieves the status of a job.
+ * @param jobId - The ID of the job.
+ */
+export const getJobStatus = async (jobId: string): Promise<Job<MeetingJobData> | undefined> => {
+  return await meetingQueue.getJob(jobId);
+};
 
-  /**
-   * Retrieves the status of a job.
-   * @param jobId - The ID of the job.
-   */
-  export const getJobStatus = async (jobId: string): Promise<Job<MeetingJobData> | undefined> => {
-    return await meetingQueue.getJob(jobId);
-  };
+/**
+ * Retrieves metrics for the queue.
+ */
+export const getQueueMetrics = async () => {
+  const [waiting, active, completed, failed] = await Promise.all([
+    meetingQueue.getWaitingCount(),
+    meetingQueue.getActiveCount(),
+    meetingQueue.getCompletedCount(),
+    meetingQueue.getFailedCount(),
+  ]);
 
-  /**
-   * Retrieves metrics for the queue.
-   */
-  export const getQueueMetrics = async () => {
-    const [waiting, active, completed, failed] = await Promise.all([
-      meetingQueue.getWaitingCount(),
-      meetingQueue.getActiveCount(),
-      meetingQueue.getCompletedCount(),
-      meetingQueue.getFailedCount(),
-    ]);
-
-    return { waiting, active, completed, failed };
-  };
+  return { waiting, active, completed, failed };
+};
