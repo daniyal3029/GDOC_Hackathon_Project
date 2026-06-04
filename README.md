@@ -8,3 +8,6 @@ To get started with the project, please refer to the individual README files in 
 
 ## Directory Structure
 The repository is divided into two main directories: founder-brain-backend and founder-brain-frontend. The backend directory contains the server-side code, while the frontend directory contains the client-side code.
+
+## Badges
+[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
