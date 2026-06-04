@@ -11,3 +11,6 @@ The repository is divided into two main directories: founder-brain-backend and f
 
 ## Badges
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
+
+## Contributing
+To contribute to this project, please fork the repository and submit a pull request. For more information, please see the CONTRIBUTING.md file.
