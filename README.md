@@ -12,3 +12,5 @@ To contribute to this project, please fork the repository and submit a pull requ
 ## Usage Examples
 * To start the backend server, navigate to the founder-brain-backend directory and run `npm run dev`.
 * To start the frontend development server, navigate to the founder-brain-frontend directory and run `npm run dev`.
+## Project Description
+The GDOC Hackathon Project is a meeting intelligence platform designed to provide a comprehensive solution for meeting management and analytics. It aims to improve the efficiency and productivity of meetings by providing features such as automated meeting summaries, action item tracking, and meeting analytics.
