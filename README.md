@@ -16,3 +16,8 @@ To contribute to this project, please fork the repository and submit a pull requ
 The GDOC Hackathon Project is a meeting intelligence platform designed to provide a comprehensive solution for meeting management and analytics. It aims to improve the efficiency and productivity of meetings by providing features such as automated meeting summaries, action item tracking, and meeting analytics.
 ## Installation
 To install the project dependencies, run `npm install` in the root directory of the project, then navigate to the founder-brain-backend and founder-brain-frontend directories and run `npm install` in each.
+## Topics
+* Meeting Management
+* Meeting Analytics
+* Automated Meeting Summaries
+* Action Item Tracking
