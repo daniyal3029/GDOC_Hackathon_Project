@@ -21,3 +21,5 @@ To install the project dependencies, run `npm install` in the root directory of 
 * Meeting Analytics
 * Automated Meeting Summaries
 * Action Item Tracking
+## License
+This project is licensed under the ISC License.
