@@ -23,3 +23,5 @@ To install the project dependencies, run `npm install` in the root directory of 
 * Action Item Tracking
 ## License
 This project is licensed under the ISC License.
+## Acknowledgments
+Special thanks to the developers who have contributed to this project, and to the open-source community for their support and resources.
