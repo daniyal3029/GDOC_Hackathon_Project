@@ -25,3 +25,15 @@ To install the project dependencies, run `npm install` in the root directory of 
 This project is licensed under the ISC License.
 ## Acknowledgments
 Special thanks to the developers who have contributed to this project, and to the open-source community for their support and resources.
+## Table of Contents
+* [Introduction](#introduction)
+* [Getting Started](#getting-started)
+* [Directory Structure](#directory-structure)
+* [Badges](#badges)
+* [Contributing](#contributing)
+* [Usage Examples](#usage-examples)
+* [Project Description](#project-description)
+* [Installation](#installation)
+* [Topics](#topics)
+* [License](#license)
+* [Acknowledgments](#acknowledgments)
