@@ -37,3 +37,9 @@ Special thanks to the developers who have contributed to this project, and to th
 * [Topics](#topics)
 * [License](#license)
 * [Acknowledgments](#acknowledgments)
+
+## Contributing Guidelines
+If you'd like to contribute to the project, please ensure that your code adheres to the following guidelines:
+* Code should be well-documented and readable
+* Code should be tested thoroughly
+* Code should follow standard professional guidelines for commit messages and API documentation
