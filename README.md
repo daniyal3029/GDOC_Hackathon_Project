@@ -48,3 +48,4 @@ For more information about the project, please visit our [wiki page](https://git
 
 [![GitHub issues](https://img.shields.io/github/issues/daniyal3029/GDOC_Hackathon_Project)](https://github.com/daniyal3029/GDOC_Hackathon_Project/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/daniyal3029/GDOC_Hackathon_Project)](https://github.com/daniyal3029/GDOC_Hackathon_Project/pulls)
+[![GitHub last commit](https://img.shields.io/github/last-commit/daniyal3029/GDOC_Hackathon_Project)](https://github.com/daniyal3029/GDOC_Hackathon_Project/commits/main)
