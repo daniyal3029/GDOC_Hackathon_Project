@@ -42,10 +42,8 @@ If you'd like to contribute to the project, please ensure that your code adheres
 * Code should be well-documented and readable
 * Code should be tested thoroughly
 * Code should follow standard professional guidelines for commit messages and API documentation
-
 ## Additional Resources
 For more information about the project, please visit our [wiki page](https://github.com/daniyal3029/GDOC_Hackathon_Project/wiki).
-
 [![GitHub issues](https://img.shields.io/github/issues/daniyal3029/GDOC_Hackathon_Project)](https://github.com/daniyal3029/GDOC_Hackathon_Project/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/daniyal3029/GDOC_Hackathon_Project)](https://github.com/daniyal3029/GDOC_Hackathon_Project/pulls)
 [![GitHub last commit](https://img.shields.io/github/last-commit/daniyal3029/GDOC_Hackathon_Project)](https://github.com/daniyal3029/GDOC_Hackathon_Project/commits/main)
