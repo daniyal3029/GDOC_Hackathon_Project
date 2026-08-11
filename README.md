@@ -46,4 +46,4 @@ If you'd like to contribute to the project, please ensure that your code adheres
 For more information about the project, please visit our [wiki page](https://github.com/daniyal3029/GDOC_Hackathon_Project/wiki).
 [![GitHub issues](https://img.shields.io/github/issues/daniyal3029/GDOC_Hackathon_Project)](https://github.com/daniyal3029/GDOC_Hackathon_Project/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/daniyal3029/GDOC_Hackathon_Project)](https://github.com/daniyal3029/GDOC_Hackathon_Project/pulls)
-[![GitHub last commit](https://img.shields.io/github/last-commit/daniyal3029/GDOC_Hackathon_Project)](https://github.com/daniyal3029/GDOC_Hackathon_Project/commits/main)
+[![GitHub last commit](https://img.shields.io/github/last-commit/daniyal3029/GDOC_Hackathon_Project)](https://github.com/daniyal3029/GDOC_Hackathon_Project/commits)
